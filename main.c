@@ -121,9 +121,8 @@ void printlog(struct session *c)
 						time(&t);
 						
 						sprintf(log,"%s Protocol: %d IPVersion:%d Source Address:%s:%d --> Destination Address:%s:%d Send:%ldKb Recieved:%ldKb",ctime(&t),c->protocol,c->tcp.version,source,ntohs(c->tcp.source),dest,ntohs(c->tcp.dest),c->tcp.sent/1024,c->tcp.received/1024);
-						printf(BLU "\r%s",log);
-						printf(RESET);
-						  fflush(stdout);
+						//printf(GRN "\r%s",log);
+						
 						//printf("%s",log);
 }
 void clear_tcp_data(struct tcp_session *cur)
@@ -338,10 +337,10 @@ struct Node *root=NULL;
 	if(fp2!=NULL)
 	{
 		char b[1000];
+		printf("getms:%u",get_ms());
 		do{
 			number++;
-			
-			//memset(b,0,sizeof(b));
+				
 			rs=fgets(b,sizeof(b),fp2);
 			if(line[0]=='#')
 				continue;
@@ -349,64 +348,72 @@ struct Node *root=NULL;
 				slen=strlen(b);
 				//for(int i=0;i<slen;i++);
 			//	line[]
-			if(b[slen-1]=='\n')
+			if(b[slen-1]=='\n')//cut new line
 				b[slen-1]='\0';//null
-				//if(strcmp(b))
-			//	printf("str:%s\n",b);
+				
 		root=insert(root,b,slen);
-		//printf("%d\t ",root);
-	//	printf("number:%d\n",number);
-		//if(args->ctx->root==NULL)
+	
 			args->ctx->root=root;
-	/*
-		
-if(root ==NULL)	{
-	
-		root=insertItr(root,line,strlen(line));
-		args->ctx->root=root;
-}
-else
-	insertItr(root,line,strlen(line));
-		*/	
-			//else
-				//insert(root,line,strlen(line));
-	
-			
+				
 		}while(rs!=NULL);
 		//exit(0);
 	}
 //printf("insertin fininsdw\n");
 
 	fclose(fp2);
+	printf("getms:%u",get_ms());
 	ti=time(NULL);
 	printf("time:%ld",ti);
 	printf("\nlist count:%d\n",number);
-	inorder(root);
+	//inorder(root);
 	//preOrder(root);
 	pthread_create(&mythread, NULL, threadfunc, args);
 	
 	char command[100];
+	char option=0;
 	
-	while (1)
+	while (option != '4')
 	{
-		memset(command,0,sizeof(command));
-		printf("\nEnter 'exit' to stop");
-		printf("\n 'data_usage' for total data usage>");
-		scanf("%s", command);
-		// printf("value:%d",q);
-		if (strcmp(command,"exit") == 0)
+		//memset(command,0,sizeof(command));
+		printf("\n 0 for options:");
+		
+		scanf("%c", &option);
+		switch(option)
+		{
+			case '0':
+			printf("\n 0 for options:");
+			printf("\n 1 to print domains list");
+			printf("\n 2 Dashboard");
+			printf("\n 3 clear screen");
+			printf("\n 4 Quit");
 			break;
-		else if(strcmp(command,"data_usage") == 0){
-			write(args->ctx->pipefds[1], command,20);
-			printf("send command\n");
+			case '1':
+			inorder(args->ctx->root);
+			break;
+			
+			case '2':
+			write(args->ctx->pipefds[1], "dashboard", 20);
+			break;
+			case '3':
+			system("clear");
+			break;
+			case '4':
+			
+			break;
+			
+			
 		}
+		
+		
+		
+		
+		
 	}
-	printf("Program ending...\n");
-	write(args->ctx->pipefds[1], command, 20);
+	
+	write(args->ctx->pipefds[1], "exit", 20);
 
 	pthread_join(mythread, NULL);
 
-	//close(server);
 	struct blocked_ip *p=args->ctx->blocked;
 	while(p!=NULL)
 	{
@@ -609,11 +616,12 @@ ev_pipe.events = EPOLLERR | EPOLLIN;
 					else
 					{
 						//printf("%s",buffer);
-						if(strcmp(buffer,"data_usage")==0)
-						{
-							
-							printf("\nTotal data usage Send:%ldMB Received:%ldMB\n",args->send/(1024*1024),args->rcvd/(1024*1024));
+						if(strcmp(buffer,"dashboard")==0){
+							printf("\nTotal Data Recieved : "GRN"%ldKB"RESET" Sent: "BLU"%ldKB",args->rcvd/1024,args->send/1024);
+							printf(RED"\n%d domains blocked."RESET,args->blocked);
+			
 						}
+						
 						else if(strcmp(buffer,"exit")==0)
 						{
 						printf("\nRead exit command");
@@ -1148,7 +1156,9 @@ void handle_sock_command(struct arguments *args, struct session *c, const int ep
 	//	printf("domain blocked\n%s",domain);
 			printf(RED);
 		printf("%s blocked\n",domain);
+		
 		printf(RESET);
+		args->blocked++;
 			char r[10];
 									r[0] = 0x05;
 									r[1] = 0x00;

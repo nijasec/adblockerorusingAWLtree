@@ -142,8 +142,7 @@ struct context {
     int stopping;
 	struct blocked_ip *blocked;
 	struct Node *root;
-	
-    struct session *session;
+	struct session *session;
 };
 struct arguments {
     int server;
@@ -151,12 +150,12 @@ struct arguments {
 	int scount;
 	long send;
 	long rcvd;
+	long blocked;
     struct context *ctx;
 };
 struct segment {
     uint16_t len;
     uint16_t sent;
-   
     uint8_t *data;
     struct segment *next;
 };

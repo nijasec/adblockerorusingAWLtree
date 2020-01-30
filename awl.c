@@ -56,13 +56,13 @@ struct Node* newNode(char *data,int len)
 { 
 	struct Node* node = (struct Node*) 
 						malloc(sizeof(struct Node)); 
-						printf("allocated for node\n");
+						//printf("allocated for node\n");
 						//printf("\tdata:%d--%d\n",len,strlen(data));
 						//printf("\n\n");
-					if(len>0)
-					{
+				//	if(len>0)
+					//{
 						node->data=(char*)malloc(len);
-					}
+					//}
 			//	else{
 				//	node->data=(char*)malloc(255);
 					
@@ -198,9 +198,14 @@ void inorder(struct Node *root)
 	if (root != NULL) 
 	{ 
 		inorder(root->left); 
-		printf("%s ", root->data); 
+		fprintf(stdout,"* %s *",root->data);
+		//fflush(stdout);//
+		fprintf(stdout," ");
+		//printf("%s ", root->data); 
 		inorder(root->right); 
+		
 	} 
+	//fprintf(stdout,"\n");
 } 
 // A utility function to print preorder traversal 
 // of the tree. 
