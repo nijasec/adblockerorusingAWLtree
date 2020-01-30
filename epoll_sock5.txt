@@ -1,0 +1,1 @@
+./Debug/main.c.o ./Debug/utils.c.o ./Debug/awl.c.o
